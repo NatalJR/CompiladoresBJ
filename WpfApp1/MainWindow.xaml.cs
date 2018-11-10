@@ -24,6 +24,7 @@ namespace WpfApp1
 	public partial class MainWindow : Window
 	{
 		public List<Simbolo> TabelaSimbolos { get; set; }
+
 		public string FileContent;
 
 		public MainWindow()
@@ -71,7 +72,6 @@ namespace WpfApp1
 					Values = new List<string>() { "ATRIBUIÇÃO", "ABRE PARÊNTESES", "FECHA PARÊNTESES", "ABRE CHAVES", "FECHA CHAVES", "PONTO E VÍRGULA" }
 				}
 			};
-
 			InitializeComponent();
 		}
 
@@ -93,7 +93,7 @@ namespace WpfApp1
 			return 0;
 		}
 
-		public List<Token> Automato()
+		private List<Token> Automato()
 		{
 			List<Token> tokens = new List<Token>();
 			int state = 38;
@@ -657,6 +657,7 @@ namespace WpfApp1
 			return tokens;
 
 		}
+
 		private void BtnLexicAnalyser_Click(object sender, RoutedEventArgs e)
 		{
 			List<Token> tokens = Automato();
