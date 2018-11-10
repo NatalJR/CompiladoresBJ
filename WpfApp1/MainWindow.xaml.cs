@@ -75,6 +75,24 @@ namespace WpfApp1
 			InitializeComponent();
 		}
 
+		private static int LineError(string conteudoArquivo, char caractereErro)
+		{
+			int contadorLinhas = 1;
+			for (int i = 0; i < conteudoArquivo.Length; i++)
+			{
+				if (conteudoArquivo[i] == '\n' || conteudoArquivo[i] == '\r')
+				{
+					contadorLinhas++;
+				}
+				else if (conteudoArquivo[i] == caractereErro)
+				{
+					return contadorLinhas;
+				}
+			}
+
+			return 0;
+		}
+
 		public List<Token> Automato()
 		{
 			List<Token> tokens = new List<Token>();
@@ -214,8 +232,7 @@ namespace WpfApp1
 								continue;
 							}
 							//Erro: caractere invalido
-							JOptionPane.showMessageDialog(null, "Erro. Caractere não permitido, " + FileContent[i] + " linha " + lineErro(FileContent, FileContent[i]) + ".");
-							System.exit(1);
+							txtEditor.Text += "Erro. Caractere não permitido, " + FileContent[i] + " linha " + LineError(FileContent, FileContent[i]) + ".";
 						}
 						break;
 					case 6:
@@ -459,7 +476,7 @@ namespace WpfApp1
 							}
 							else
 							{
-								tokens.Add(new Token("ID", new String(buffer), "id", line));
+								tokens.Add(new Token("ID", buffer, "id", line));
 								buffer = "";
 								state = 38;
 								i--;
@@ -519,7 +536,7 @@ namespace WpfApp1
 								}
 								else
 								{
-									tokens.Add(new Token("NÚMERO", new String(buffer), "valor_inteiro", line));
+									tokens.Add(new Token("NÚMERO", buffer, "valor_inteiro", line));
 									buffer = "";
 									state = 38;
 									i--;
@@ -547,7 +564,7 @@ namespace WpfApp1
 							}
 							else
 							{
-								tokens.Add(new Token("NÚMERO", new String(buffer), "valor_float", line));
+								tokens.Add(new Token("NÚMERO", buffer, "valor_float", line));
 								buffer = "";
 								state = 38;
 								i--;
@@ -572,21 +589,21 @@ namespace WpfApp1
 								}
 								else
 								{
-									if (tabelaSimbolos.get("Palavras Reservadas").contains(buffer.toUpperCase()))
+									if (TabelaSimbolos.Find(x=>x.Type=="Palavras Reservadas").Values.Contains(buffer.ToUpper()))
 									{
-										tokens.Add(new Token(buffer.toUpperCase(), new String(buffer), new String(buffer), line));
+										tokens.Add(new Token(buffer.ToUpper(), buffer, buffer, line));
 									}
-									else if (tabelaSimbolos.get("Tipo").contains(buffer.toUpperCase()))
+									else if (TabelaSimbolos.Find(x=>x.Type=="Tipo").Values.Contains(buffer.ToUpper()))
 									{
-										tokens.Add(new Token(buffer.toUpperCase(), new String(buffer), new String(buffer), line));
+										tokens.Add(new Token(buffer.ToUpper(), buffer, buffer, line));
 									}
-									else if (tabelaSimbolos.get("Valores Booleanos").contains(buffer.toUpperCase()))
+									else if (TabelaSimbolos.Find(x=>x.Type=="Valores Booleanos").Values.Contains(buffer.ToUpper()))
 									{
-										tokens.Add(new Token(buffer.toUpperCase(), new String(buffer), "valor_booleano", line));
+										tokens.Add(new Token(buffer.ToUpper(), buffer, "valor_booleano", line));
 									}
 									else
 									{
-										tokens.Add(new Token("id", new String(buffer), "id", line));
+										tokens.Add(new Token("id", buffer, "id", line));
 									}
 
 									buffer = "";
@@ -612,7 +629,7 @@ namespace WpfApp1
 						}
 					case 5:
 						{
-							tokens.Add(new Token("STRING", new String(buffer), "string", line));
+							tokens.Add(new Token("STRING", buffer, "string", line));
 							buffer = "";
 							state = 38;
 							i--;
@@ -620,7 +637,7 @@ namespace WpfApp1
 						break;
 					case 40:
 						{
-							tokens.Add(new Token("CARACTERE", char.toString(FileContent[i]), "valor_caractere", line));
+							tokens.Add(new Token("CARACTERE", char.ToString(FileContent[i]), "valor_caractere", line));
 							buffer = "";
 							state = 41;
 						}
@@ -636,25 +653,35 @@ namespace WpfApp1
 						break;
 
 				}
-
 			}
 			return tokens;
 
 		}
+		private void BtnLexicAnalyser_Click(object sender, RoutedEventArgs e)
+		{
+			List<Token> tokens = Automato();
+			txtEditor.Text += "\r\n\r";
+			foreach(var token in tokens)
+			{
+				txtEditor.Text+=token.ToString();
+			}
+		}
 
 		private void BtnOpenFile_Click(object sender, RoutedEventArgs e)
 		{
-			OpenFileDialog openFileDialog = new OpenFileDialog();
-			openFileDialog.Filter = "BJ (*.bj)|*.bj|All files (*.*)|*.*";
+			OpenFileDialog openFileDialog = new OpenFileDialog
+			{
+				Filter = "BJ (*.bj)|*.bj|All files (*.*)|*.*"
+			};
 
 			if (openFileDialog.ShowDialog() == true)
 			{
 				var fileContent = File.ReadAllText(openFileDialog.FileName);
 
 				//Regex.Replace(fileContent, @"(""[^""\\]*(?:\\.[^""\\]*)*"")|\s+", "$1");
-				var aidString = fileContent.Replace("\r", string.Empty);
-				FileContent = aidString;
-				txtEditor.Text = aidString;
+				var aidstring = fileContent.Replace("\r", string.Empty);
+				FileContent = aidstring;
+				txtEditor.Text = openFileDialog.FileName;
 			}
 
 		}

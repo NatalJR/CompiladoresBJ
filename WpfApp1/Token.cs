@@ -28,9 +28,9 @@ namespace WpfApp1
 			Tipo = _Tipo;
 		}
 
-		//public override string ToString()
-		//{
-		//	return "token=" + token + " lexema=" + Lexema + " tipo= " + Tipo + "\n"; 
-		//}
+		public override string ToString()
+		{
+			return "token=" + token + " lexema=" + Lexema + " tipo= " + Tipo + "\n";
+		}
 	}
 }
